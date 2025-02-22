@@ -1,12 +1,12 @@
-import './App.css'
 import { useCart } from './assets/hooks/useCart.ts'
 import Guitar from './assets/components/Guitar'
 import Header from './assets/components/Header.tsx'
+import Spinner from './assets/components/Spinner.tsx'
 
 function App() {
 
     //hook personalizado
-    const {data, cart, addToCart, removeItemToCart, decreaseQuantity, increaseQuantity, emptyCart, cartIsEmpty, cartTotal} = useCart();
+    const {cart, data, error, isLoading, addToCart, removeItemToCart, decreaseQuantity, increaseQuantity, emptyCart, cartIsEmpty, cartTotal} = useCart();
     
     return (
         <>
@@ -23,8 +23,10 @@ function App() {
             <main className="container-xl mt-5">
                 <h2 className="text-center">Nuestra Colección</h2>
 
+                {isLoading && <Spinner/>}
+
                 <div className="row mt-5">
-                    {data && data.map( (guitar) => (
+                    {data && data.data.map( (guitar) => (
                         <Guitar
                             key={`guitar-${guitar.id}`}
                             guitar={guitar}

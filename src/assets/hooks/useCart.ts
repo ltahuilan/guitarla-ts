@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import type { Guitar, CartItem, GuitarId } from '../types'
-import { db } from '../data/data'
+import axios from 'axios';
+import useSWR from 'swr';
 
 export const useCart = () => {
 
@@ -9,11 +10,30 @@ export const useCart = () => {
         return cartLocalStorage ? JSON.parse(cartLocalStorage) : [];
     }
 
-    const [data] = useState(db);
     const [cart, setCart] = useState(initialCart);
 
     const MAX_ITEMS = 5;
     const MIN_ITEMS = 1;
+    
+    const fetcher = () => axios.get('http://127.0.0.1:8000/api/guitars').then(res => res.data)
+    const { data, error, isLoading } = useSWR('http://127.0.0.1:8000/api/guitars', fetcher)
+
+
+
+    
+    // const getGuitars = () => {                
+
+    //     try {
+    //         const {data} = await axios.get('http://127.0.0.1:8000/api/guitars');
+    //         setData(data.data);
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // }
+
+    // useEffect(() => {
+    //     getGuitars()
+    // }, [])
 
     useEffect(() => {
         localStorage.setItem('CART', JSON.stringify(cart));
@@ -81,8 +101,10 @@ export const useCart = () => {
     const cartTotal = useMemo(() => cart.reduce( (total, item) => total + (item.quantity * item.price), 0 ), [cart] );
     
     return {
-        data,
         cart,
+        data,
+        error,
+        isLoading,
         addToCart,
         removeItemToCart,
         decreaseQuantity,
